@@ -9,16 +9,19 @@ import org.scalacheck.Gen
 
 object DisjunctionTaskGenerator extends TaskGenerator {
 
-  def genTask(depth: Int): Gen[Task] = for {
+  def genTask(depth: Int): Gen[Task] = {
+    println(s"Disjunction Task build start. Depth $depth")
+    for {
 
-    disjunctionBranches <- Gen.oneOf(genBooleanDisjunctionTaskBranches(depth),
-                                     genIntDisjunctionTaskBranches(depth))
+      disjunctionBranches <- Gen.oneOf(genBooleanDisjunctionTaskBranches(depth),
+        genIntDisjunctionTaskBranches(depth))
 
-    disjunction <- new DisjunctionTask with TestingTask {
-      override protected def branches: List[(ReadableExecutionContext => Boolean, Task)] = disjunctionBranches
-    }
+      disjunction = new DisjunctionTask with TestingTask {
+        override protected def branches: List[(ReadableExecutionContext => Boolean, Task)] = disjunctionBranches
+      }
 
-  } yield disjunction
+    } yield disjunction
+  }
 
 
   private def genBooleanDisjunctionTaskBranches(depth: Int): Gen[List[(ReadableExecutionContext => Boolean, Task)]] = for {
@@ -39,7 +42,7 @@ object DisjunctionTaskGenerator extends TaskGenerator {
 
     branches <- Gen.sequence(for(i <- 0 to n) yield getIntBranch(i, n, depth))
 
-  } yield branches.asScala
+  } yield branches.asScala.toList
 
   private def getIntBranch(i: Int, n: Int, depth: Int): Gen[(ReadableExecutionContext => Boolean, Task)] = for {
 

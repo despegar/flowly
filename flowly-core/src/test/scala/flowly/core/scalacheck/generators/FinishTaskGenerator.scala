@@ -6,7 +6,8 @@ import org.scalacheck.Gen
 
 object FinishTaskGenerator extends TaskGenerator {
 
-  def genTask(): Gen[FinishTask] = {
+  def genTask(depth: Int): Gen[FinishTask] = {
+    println(s"Finish Task build start. Depth $depth")
     new FinishTask(UUID()) with TestingTask
   }
 

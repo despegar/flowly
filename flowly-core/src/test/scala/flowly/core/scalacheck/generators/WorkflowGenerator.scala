@@ -14,7 +14,7 @@ object WorkflowGenerator extends TaskGenerator {
 
   def genWorkflow: Gen[Workflow] = for {
 
-    firstTask <- genNextTask(1)
+    firstTask <- genNextTask(0)
 
     workflow <- Gen.const(new Workflow {
 

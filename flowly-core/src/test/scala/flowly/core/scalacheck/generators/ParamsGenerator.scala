@@ -6,7 +6,7 @@ import org.scalacheck.Gen
 
 object ParamsGenerator {
 
-  def getParams: Gen[Seq[Param]] = for {
+  def getParams: Gen[List[Param]] = for {
 
     param1 <- intParam()
 
@@ -14,11 +14,11 @@ object ParamsGenerator {
 
     params <- Gen.someOf(List(param1, param2))
 
-  } yield params
+  } yield params.toList
 
   private def intParam(): Gen[Param] = for {
 
-    value <- Gen[Int]
+    value <- Gen.choose(Int.MinValue, Int.MaxValue)
 
   } yield Param(IntKey, value)
 

@@ -8,23 +8,28 @@ import org.scalacheck.Gen
 
 object ExecutionTaskGenerator extends TaskGenerator {
 
-  def genTask(depth: Int): Gen[Task] = for {
+  def genTask(depth: Int): Gen[Task] = {
 
-    nextTask <- genNextTask(depth)
+    println(s"Execution Task build start. Depth $depth")
 
-    performImplementation <- Gen.frequency(8 -> doNothing,
-                                           1 -> setBooleanKey,
-                                           1 -> setIntKey)
+    for {
 
-    task <- new ExecutionTask with TestingTask {
+      nextTask <- genNextTask(depth)
 
-      override protected def perform(sessionId: String, executionContext: WritableExecutionContext): ErrorOr[WritableExecutionContext] = performImplementation(executionContext)
+      performImplementation <- Gen.frequency(8 -> doNothing,
+        1 -> setBooleanKey,
+        1 -> setIntKey)
 
-      override val next: Task = nextTask
+      task = new ExecutionTask with TestingTask {
 
-    }
+        override protected def perform(sessionId: String, executionContext: WritableExecutionContext): ErrorOr[WritableExecutionContext] = performImplementation.apply(executionContext)
 
-  } yield task
+        override val next: Task = nextTask
+
+      }
+
+    } yield task
+  }
 
 
   private def doNothing: Gen[WritableExecutionContext => ErrorOr[WritableExecutionContext]] = (executionContext: WritableExecutionContext) => Right(executionContext)
@@ -32,14 +37,14 @@ object ExecutionTaskGenerator extends TaskGenerator {
 
   private def setBooleanKey: Gen[WritableExecutionContext => ErrorOr[WritableExecutionContext]] = for {
 
-    value <- Gen[Boolean]
+    value <- Gen.oneOf(true, false)
 
   } yield (executionContext: WritableExecutionContext) => Right(executionContext.set(BooleanKey, value))
 
 
-  private def setIntKey: Gen[ErrorOr[WritableExecutionContext]] = for {
+  private def setIntKey: Gen[WritableExecutionContext => ErrorOr[WritableExecutionContext]] = for {
 
-    value <- Gen[Int]
+    value <- Gen.choose(Int.MinValue, Int.MaxValue)
 
   } yield (executionContext: WritableExecutionContext) => Right(executionContext.set(IntKey, value))
 
