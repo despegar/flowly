@@ -1,7 +1,6 @@
 package flowly.core.scalacheck.generators
 
-import flowly.core.scalacheck.model.BooleanKey
-import flowly.core.{IntKey, Param}
+import flowly.core.{BooleanKey, IntKey, Param}
 import org.scalacheck.Gen
 
 object ParamsGenerator {
@@ -27,5 +26,11 @@ object ParamsGenerator {
     value <- Gen.oneOf(true, false)
 
   } yield Param(BooleanKey, value)
+
+}
+
+object ParamsGroupsGenerator {
+
+  def getParamsGroups: Gen[Iterator[List[Param]]] = Gen.infiniteStream(ParamsGenerator.getParams).flatMap(_.iterator)
 
 }

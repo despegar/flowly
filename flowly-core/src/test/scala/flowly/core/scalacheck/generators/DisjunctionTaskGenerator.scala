@@ -1,26 +1,33 @@
 package flowly.core.scalacheck.generators
 
-import flowly.core.IntKey
+import flowly.core.{BooleanKey, IntKey}
 import flowly.core.context.ReadableExecutionContext
+import flowly.core.scalacheck.generators.BlockingTaskGenerator.getTaskId
+
 import scala.jdk.CollectionConverters._
-import flowly.core.scalacheck.model.{BooleanKey, TestingTask}
 import flowly.core.tasks.basic.{DisjunctionTask, Task}
 import org.scalacheck.Gen
 
 object DisjunctionTaskGenerator extends TaskGenerator {
 
   def genTask(depth: Int): Gen[Task] = {
-    println(s"Disjunction Task build start. Depth $depth")
+
     for {
 
       disjunctionBranches <- Gen.oneOf(genBooleanDisjunctionTaskBranches(depth),
-        genIntDisjunctionTaskBranches(depth))
+                                       genIntDisjunctionTaskBranches(depth))
 
-      disjunction = new DisjunctionTask with TestingTask {
+      taskId <- getTaskId
+
+      disjunction = new DisjunctionTask {
+
+        override val id: String = taskId
+
         override protected def branches: List[(ReadableExecutionContext => Boolean, Task)] = disjunctionBranches
       }
 
     } yield disjunction
+
   }
 
 
@@ -30,11 +37,8 @@ object DisjunctionTaskGenerator extends TaskGenerator {
 
     task2 <- genNextTask(depth)
 
-    task3 <- genNextTask(depth)
-
-  } yield List(((c: ReadableExecutionContext) => c.get(BooleanKey).exists(v => v),task1),
-               ((c: ReadableExecutionContext) => c.get(BooleanKey).exists(v => !v),task2),
-               ((c: ReadableExecutionContext) => !c.contains(BooleanKey), task3))
+  } yield List(((c: ReadableExecutionContext) => c.get(BooleanKey).exists(v => v), task1),
+               ((c: ReadableExecutionContext) => !c.contains(BooleanKey) || c.get(BooleanKey).exists(v => !v), task2))
 
   private def genIntDisjunctionTaskBranches(depth: Int): Gen[List[(ReadableExecutionContext => Boolean, Task)]] = for {
 
@@ -42,7 +46,11 @@ object DisjunctionTaskGenerator extends TaskGenerator {
 
     branches <- Gen.sequence(for(i <- 0 to n) yield getIntBranch(i, n, depth))
 
-  } yield branches.asScala.toList
+    defaultNextTask <- genNextTask(depth)
+
+    defaultBranch = ((c: ReadableExecutionContext) => !c.contains(IntKey), defaultNextTask)
+
+  } yield branches.asScala.toList :+ defaultBranch
 
   private def getIntBranch(i: Int, n: Int, depth: Int): Gen[(ReadableExecutionContext => Boolean, Task)] = for {
 
@@ -50,7 +58,7 @@ object DisjunctionTaskGenerator extends TaskGenerator {
 
     intervalLength = (Int.MaxValue.toLong - Int.MinValue.toLong) / n
 
-    condition = (c: ReadableExecutionContext) => c.get(IntKey).exists(v => (Int.MinValue + i * intervalLength) <= v && v < (Int.MinValue + (i + 1) * intervalLength))
+    condition = (c: ReadableExecutionContext) => c.get(IntKey).exists(v => ((Int.MinValue + i * intervalLength) <= v && v < (Int.MinValue + (i + 1) * intervalLength)) || (i == n && Int.MaxValue == v))
 
   } yield (condition, nextTask)
 

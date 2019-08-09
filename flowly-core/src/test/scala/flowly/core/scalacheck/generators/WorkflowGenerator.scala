@@ -16,14 +16,14 @@ object WorkflowGenerator extends TaskGenerator {
 
     firstTask <- genNextTask(0)
 
-    workflow <- Gen.const(new Workflow {
+    workflow = new Workflow {
 
       override def initialTask: Task = firstTask
 
       override val repository: Repository = new InMemoryRepository()
 
       override val executionContextFactory: ExecutionContextFactory = new ExecutionContextFactory(new JacksonSerializer(Components.objectMapper))
-    })
+    }
 
   } yield workflow
 
