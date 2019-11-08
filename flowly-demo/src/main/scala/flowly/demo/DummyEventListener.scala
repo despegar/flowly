@@ -40,7 +40,7 @@ class DummyEventListener extends EventListener {
     println(s"session $sessionId task $currentTask executed, next $nextTask")
   }
 
-  def onSkip(sessionId: SessionId, variables: ReadableExecutionContext, currentTask: String, nextTask: String): Unit = {
+  def onSkipAndContinue(sessionId: SessionId, variables: ReadableExecutionContext, currentTask: String, nextTask: String): Unit = {
     println(s"session $sessionId task $currentTask skipped, next $nextTask")
   }
 

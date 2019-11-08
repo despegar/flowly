@@ -31,7 +31,7 @@ class BaseEventListener extends EventListener {
 
   def onContinue(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String, nextTask:String): Unit = ()
 
-  def onSkip(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String, nextTask: String): Unit = ()
+  def onSkipAndContinue(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String, nextTask: String): Unit = ()
 
   def onBlock(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit = ()
 

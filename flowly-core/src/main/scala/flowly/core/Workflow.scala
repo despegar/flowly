@@ -137,8 +137,7 @@ trait Workflow {
 
           // On skip and Continue Events
           eventListeners.foreach(l => {
-            l.onSkip(session.sessionId, resultingExecutionContext, task.name, nextTask.name)
-            l.onContinue(session.sessionId, resultingExecutionContext, task.name, nextTask.name)
+            l.onSkipAndContinue(session.sessionId, resultingExecutionContext, task.name, nextTask.name)
           })
 
           // Execute next Task
