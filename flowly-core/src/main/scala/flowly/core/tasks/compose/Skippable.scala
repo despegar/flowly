@@ -32,7 +32,7 @@ trait Skippable extends Task with Dependencies {
   /**
     * This method give us a compile-time check about [[Alternative]] use
     */
-  override private[flowly] def alternativeAfterAll():Unit = ()
+  override private[flowly] def alternativeAfterAll(): Unit = ()
 
 }
 

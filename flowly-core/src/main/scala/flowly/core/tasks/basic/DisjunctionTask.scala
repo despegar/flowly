@@ -16,7 +16,7 @@
 
 package flowly.core.tasks.basic
 
-import flowly.core.DisjunctionTaskError
+import flowly.core.{DisjunctionTaskError, ErrorOr}
 import flowly.core.tasks.model.{Block, Continue, OnError, TaskResult}
 import flowly.core.context.{ExecutionContext, ReadableExecutionContext}
 
@@ -28,7 +28,7 @@ import flowly.core.context.{ExecutionContext, ReadableExecutionContext}
   */
 trait DisjunctionTask extends Task {
 
-  protected def branches: List[(ReadableExecutionContext => Boolean, Task)]
+  protected def branches: List[(ReadableExecutionContext => ErrorOr[Boolean], Task)]
 
   /**
     * This task is going to block instead of fail when there are no conditions that match
@@ -36,11 +36,19 @@ trait DisjunctionTask extends Task {
   protected def blockOnNoCondition:Boolean
 
   private[flowly] def execute(sessionId: String, executionContext: ExecutionContext): TaskResult = try {
-    branches.collectFirst { case (condition, task) if condition(executionContext) => task } match {
-      case Some(next) => Continue(next, executionContext)
-      case None if blockOnNoCondition => Block
-      case None => OnError(DisjunctionTaskError(name))
+
+    val branch = branches.to(LazyList).map{case (condition, nextTask) => (condition(executionContext), nextTask)}.dropWhile({
+      case (Right(false), _) => true
+      case _ => false
+    }).headOption
+
+    branch match {
+      case Some((Right(true), nextTask)) => Continue(nextTask, executionContext)
+      case Some((Right(false), _)) | None if blockOnNoCondition => Block
+      case Some((Right(false), _)) | None => OnError(DisjunctionTaskError(name))
+      case Some((Left(throwable),_)) => OnError(throwable)
     }
+
   } catch {
     case throwable: Throwable => OnError(throwable)
   }

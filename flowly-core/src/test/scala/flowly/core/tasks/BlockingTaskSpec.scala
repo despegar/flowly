@@ -26,17 +26,17 @@ class BlockingTaskSpec extends Specification {
   "BlockingTask" should {
 
     "block execution if condition is false" in new TasksContext {
-      val task = tasks.BlockingTask("1", FinishTask("2"), _.contains(BooleanKey), List(StringKey))
+      val task = tasks.BlockingTask("1", FinishTask("2"), e => Right(e.contains(BooleanKey)), List(StringKey))
       task.execute("session1", ec) must_== Block
     }
 
     "continue execution if condition is true" in new TasksContext {
-      val task = tasks.BlockingTask("1", FinishTask("2"), _.contains(StringKey), List(StringKey))
+      val task = tasks.BlockingTask("1", FinishTask("2"), e => Right(e.contains(StringKey)), List(StringKey))
       task.execute("session1", ec) must haveClass[Continue]
     }
 
     "after a continue variables must be the same" in new TasksContext {
-      val task = tasks.BlockingTask("1", FinishTask("2"), _.contains(StringKey), List(StringKey))
+      val task = tasks.BlockingTask("1", FinishTask("2"), e => Right(e.contains(StringKey)), List(StringKey))
       task.execute("session1", ec) match {
         case Continue(_, v) => v must_=== ec
         case otherwise => failure(s"$otherwise must be Continue")
@@ -44,7 +44,7 @@ class BlockingTaskSpec extends Specification {
     }
 
     "after a continue next task must be correct" in new TasksContext {
-      val task = tasks.BlockingTask("1", FinishTask("2"), _.contains(StringKey), List(StringKey))
+      val task = tasks.BlockingTask("1", FinishTask("2"), e => Right(e.contains(StringKey)), List(StringKey))
       task.execute("session1", ec) match {
         case Continue(nextTask, _) => nextTask must_=== task.next
         case otherwise => failure(s"$otherwise must be Continue")
