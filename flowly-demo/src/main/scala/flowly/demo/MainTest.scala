@@ -76,7 +76,7 @@ object MainTest extends App {
     lazy val blocking: Task = new BlockingTask {
       override val next: Task = finish
 
-      override protected def condition(executionContext: ReadableExecutionContext) = executionContext.contains(Key3)
+      override protected def condition(executionContext: ReadableExecutionContext) = Right(executionContext.contains(Key3))
 
       override protected def customAllowedKeys = List(Key3)
     }
@@ -115,7 +115,7 @@ object MainTest extends App {
   trait BlockingDisjunctionComponent {
     this: Finish2Component with DisjunctionComponent =>
     lazy val blockingDisjunction: Task = new DisjunctionTask {
-      protected def branches = List((_.contains(Key5), disjunction), (_.contains(Key6), finish2))
+      protected def branches = List((e => Right(e.contains(Key5)), disjunction), (e => Right(e.contains(Key6)), finish2))
 
       protected def customAllowedKeys = List(Key5, Key6)
 
@@ -126,7 +126,7 @@ object MainTest extends App {
   trait DisjunctionComponent {
     this: Finish2Component with SecondComponent =>
     lazy val disjunction: Task = new DisjunctionTask {
-      protected def branches = List((_.contains(Key4), finish2), (_ => true, second))
+      protected def branches = List((e => Right(e.contains(Key4)), finish2), (_ => Right(true), second))
 
       protected def customAllowedKeys = Nil
 

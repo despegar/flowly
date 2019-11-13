@@ -7,13 +7,13 @@ import flowly.core.tasks.basic.Task
 
 object BlockingTask {
 
-  def apply(_name: String, _next: Task, _condition: ReadableExecutionContext => Boolean, _allowedKeys: List[Key[_]]): basic.BlockingTask = new basic.BlockingTask {
+  def apply(_name: String, _next: Task, _condition: ReadableExecutionContext => ErrorOr[Boolean], _allowedKeys: List[Key[_]]): basic.BlockingTask = new basic.BlockingTask {
 
     override def name: String = _name
 
     val next: Task = _next
 
-    def condition(variables: ReadableExecutionContext): Boolean = _condition(variables)
+    def condition(variables: ReadableExecutionContext): ErrorOr[Boolean] = _condition(variables)
 
     override protected def customAllowedKeys = Nil
 
@@ -23,7 +23,7 @@ object BlockingTask {
 
 object DisjunctionTask {
 
-  def apply(_name: String, _branches: (ReadableExecutionContext => Boolean, Task)*): basic.DisjunctionTask = new basic.DisjunctionTask {
+  def apply(_name: String, _branches: (ReadableExecutionContext => ErrorOr[Boolean], Task)*): basic.DisjunctionTask = new basic.DisjunctionTask {
 
     override def name: String = _name
 
@@ -31,23 +31,23 @@ object DisjunctionTask {
 
     override protected def blockOnNoCondition = false
 
-    def branches: List[(ReadableExecutionContext => Boolean, Task)] = _branches.toList
+    def branches: List[(ReadableExecutionContext => ErrorOr[Boolean], Task)] = _branches.toList
   }
 
-  def apply(_id: String, ifTrue: Task, ifFalse: Task, condition: ReadableExecutionContext => Boolean): basic.DisjunctionTask = {
-    apply(_id, (condition, ifTrue), (_ => true, ifFalse))
+  def apply(_id: String, ifTrue: Task, ifFalse: Task, condition: ReadableExecutionContext => ErrorOr[Boolean]): basic.DisjunctionTask = {
+    apply(_id, (condition, ifTrue), (_ => Right(true), ifFalse))
   }
 
 }
 
 object BlockingDisjunctionTask {
-  def apply(_name: String, _allowedKeys: List[Key[_]], _branches: (ReadableExecutionContext => Boolean, Task)*): basic.DisjunctionTask = new basic.DisjunctionTask {
+  def apply(_name: String, _allowedKeys: List[Key[_]], _branches: (ReadableExecutionContext => ErrorOr[Boolean], Task)*): basic.DisjunctionTask = new basic.DisjunctionTask {
 
     override def name: String = _name
 
     override protected def customAllowedKeys = Nil
 
-    def branches: List[(ReadableExecutionContext => Boolean, Task)] = _branches.toList
+    def branches: List[(ReadableExecutionContext => ErrorOr[Boolean], Task)] = _branches.toList
 
     override protected def blockOnNoCondition = true
 

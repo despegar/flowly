@@ -16,6 +16,7 @@
 
 package flowly.core.tasks.basic
 
+import flowly.core.ErrorOr
 import flowly.core.tasks.model.{Block, Continue, OnError, TaskResult}
 import flowly.core.context.{ExecutionContext, ReadableExecutionContext}
 
@@ -30,10 +31,14 @@ trait BlockingTask extends Task {
 
   val next: Task
 
-  protected def condition(executionContext: ReadableExecutionContext): Boolean
+  protected def condition(executionContext: ReadableExecutionContext): ErrorOr[Boolean]
 
   private[flowly] def execute(sessionId: String, executionContext: ExecutionContext): TaskResult = try {
-    if (condition(executionContext)) Continue(next, executionContext) else Block
+    condition(executionContext) match {
+      case Right(true) => Continue(next, executionContext)
+      case Right(false) => Block
+      case Left(throwable) => OnError(throwable)
+    }
   } catch {
     case throwable: Throwable => OnError(throwable)
   }
