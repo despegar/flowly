@@ -1,5 +1,6 @@
 package flowly.core.workflow
 
+import flowly.core._
 import flowly.core.context.ExecutionContextFactory
 import flowly.core.repository.model.Session
 import flowly.core.repository.model.Status.{CANCELLED, FINISHED}
@@ -8,12 +9,10 @@ import flowly.core.serialization.Serializer
 import flowly.core.tasks.ExecutionTask
 import flowly.core.tasks.basic.{FinishTask, Task}
 import flowly.core.tasks.compose.CancelFlow
-import flowly.core._
-import org.specs2.matcher.{EitherMatchers, ResultMatchers}
 import org.specs2.mutable.Specification
 
 
-class WorkflowSpec extends Specification with EitherMatchers with ResultMatchers {
+class WorkflowSpec extends Specification {
 
   private def buildWorkflow(serializer: Serializer): Workflow = {
     val thirdTask = FinishTask("OK")
@@ -81,7 +80,6 @@ class WorkflowSpec extends Specification with EitherMatchers with ResultMatchers
       } yield session
 
       sessionOrError must beAnInstanceOf[Left[SessionCantBeExecuted, Session]]
-
     }
 
   }
