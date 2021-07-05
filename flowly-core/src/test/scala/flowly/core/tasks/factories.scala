@@ -3,6 +3,7 @@ package flowly.core.tasks
 import flowly.core.ErrorOr
 import flowly.core.context.{Key, ReadableExecutionContext, WritableExecutionContext}
 import flowly.core.tasks.basic.Task
+import flowly.core.tasks.compose.Cancellable
 
 
 object BlockingTask {
@@ -66,4 +67,16 @@ object ExecutionTask {
 
   }
 
+}
+
+object BlockingCancellableTask {
+  def apply(_name: String, _next: Task, _condition: ReadableExecutionContext => ErrorOr[Boolean],
+            _allowedKeys: List[Key[_]]): basic.BlockingTask = new basic.BlockingTask with Cancellable {
+
+    override val next: Task = _next
+
+    override protected def condition(executionContext: ReadableExecutionContext): ErrorOr[Boolean] = _condition.apply(executionContext)
+
+    override protected def customAllowedKeys: List[Key[_]] = _allowedKeys
+  }
 }
