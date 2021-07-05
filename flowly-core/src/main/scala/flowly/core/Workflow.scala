@@ -167,6 +167,15 @@ trait Workflow {
 
         })
 
+      case Cancel =>
+        repository.update(session.cancelled(task)).fold(onFailure, { session =>
+
+          // On Cancel Event
+          eventListeners.foreach(_.onCancel(session.sessionId, executionContext, task.name))
+
+          Right(ExecutionResult(session, executionContext, task))
+        })
+
       case ToRetry(cause, attempts) =>
 
         repository.update(session.toRetry(task, cause, attempts)).fold(onFailure, { session =>
