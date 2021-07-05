@@ -44,7 +44,7 @@ case class Session(sessionId: SessionId, variables: Variables, lastExecution: Op
   }
 
   def cancelled(task: Task): Session = {
-    copy(lastExecution = Option(Execution(task.name, "Flow cancelled by user")), status = CANCELLED, attempts = None)
+    copy(lastExecution = Option(Execution(task.name, "Flow cancelled by user")), status = CANCELLED, attempts = attempts.map(_.stopRetrying()))
   }
 
   def onError(task: Task, throwable: Throwable): Session = {

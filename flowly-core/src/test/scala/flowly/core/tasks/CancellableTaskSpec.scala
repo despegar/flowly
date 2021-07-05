@@ -9,7 +9,7 @@ import org.specs2.mutable.Specification
 
 class CancellableTaskSpec extends Specification {
 
-  val blockingCancellable = tasks.BlockingCancellableTask("BlockingCancellableTask", FinishTask("OK"), ec => Right(ec.contains(BooleanKey)), List.empty)
+  val blockingCancellable = tasks.BlockingRetryCancellableTask("BlockingCancellableTask", FinishTask("OK"), ec => Right(ec.contains(BooleanKey)), List.empty)
 
   "Cancellable task" should {
     "return Cancel task status after execution" in new TasksContext {
