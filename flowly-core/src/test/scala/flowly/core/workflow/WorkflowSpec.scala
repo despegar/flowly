@@ -8,7 +8,7 @@ import flowly.core.repository.{InMemoryRepository, Repository}
 import flowly.core.serialization.Serializer
 import flowly.core.tasks.ExecutionTask
 import flowly.core.tasks.basic.{FinishTask, Task}
-import flowly.core.tasks.compose.{CancelFlow, Retryable}
+import flowly.core.tasks.compose.Retryable
 import org.specs2.mutable.Specification
 
 
@@ -69,7 +69,7 @@ class WorkflowSpec extends Specification {
       val sessionOrError = for {
         sessionId     <- workflow.init(Param(StringKey, "test"))
         _             <- workflow.execute(sessionId, List.empty)
-        _             <- workflow.execute(sessionId, Param(CancelFlow, true))
+        _             <- workflow.cancel(sessionId)
         session       <- workflow.repository.getById(sessionId)
       } yield session
 
@@ -84,7 +84,7 @@ class WorkflowSpec extends Specification {
       val sessionOrError = for {
         sessionId     <- workflow.init(Param(StringKey, "test"))
         _             <- workflow.execute(sessionId, List.empty)
-        _             <- workflow.execute(sessionId, Param(CancelFlow, true))
+        _             <- workflow.cancel(sessionId)
         _             <- workflow.execute(sessionId, Param(BooleanKey, true))
         session       <- workflow.repository.getById(sessionId)
       } yield session
@@ -101,7 +101,7 @@ class WorkflowSpec extends Specification {
         _                 =  workflow.execute(sessionId, Param(StringKey, "fail"))
         sessionAfterError <- workflow.repository.getById(sessionId)
         _                 = if (sessionAfterError.status != TO_RETRY) throw new RuntimeException("Invalid status after fail with Retryable error on retryable task")
-        _                 <- workflow.execute(sessionId, Param(CancelFlow, true))
+        _                 <- workflow.cancel(sessionId)
         session           <- workflow.repository.getById(sessionId)
       } yield session
 
