@@ -23,6 +23,7 @@ import flowly.core.repository.model.Session.SessionId
 import flowly.core.tasks.basic.Task
 import flowly.core.tasks.model._
 import flowly.core.context.{ExecutionContextFactory, Key}
+import flowly.core.tasks.compose.CancelFlow
 
 import scala.annotation.tailrec
 
@@ -200,6 +201,10 @@ trait Workflow {
 
     }
 
+  }
+
+  def cancel(sessionId: SessionId): ErrorOr[ExecutionResult] = {
+    execute(sessionId, List(Param(CancelFlow, true)))
   }
 
   /**
