@@ -55,8 +55,8 @@ override def initialTask: Task = new MyFirstTask(new SecondTask(new ThirdTask(Fi
 ### Disjunction task
 
 ## Composable Tasks
-You can't create these tasks without mixing with Basic tasks. They provide retry, cancel, 
-and Skippable behaviors for tasks.
+You can't create these tasks without mixing with Basic tasks. They provide retry, cancel, and Skippable behaviors for 
+tasks.
 
 //TODO: Alternative, Condition, Dependencies
 
@@ -66,7 +66,13 @@ and Skippable behaviors for tasks.
 //TODO
 
 ### Cancellable task
-//TODO
+You can make your task 'cancellable' by mixing Cancellable trait. 
+
+Then call cancel workflow method with sessionId(will fail if current task does not support cancellation)
+
+You can also define task to run when the cancellation process starts by overriding followedByAfterCancel method.
+Take care with your last task, It should be CancelTask like in base method.
+
 ### Alternative
 //TODO
 ### Condition
