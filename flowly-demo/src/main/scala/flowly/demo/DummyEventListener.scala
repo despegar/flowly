@@ -60,4 +60,7 @@ class DummyEventListener extends EventListener {
     println(s"session $sessionId in task $currentTask is going to retry ${attempts.nextRetry}")
   }
 
+  def onCancel(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit =
+    println(s"session $sessionId has just been cancelled in task $currentTask.")
+
 }

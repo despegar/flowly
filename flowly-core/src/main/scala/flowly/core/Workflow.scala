@@ -23,6 +23,7 @@ import flowly.core.repository.model.Session.SessionId
 import flowly.core.tasks.basic.Task
 import flowly.core.tasks.model._
 import flowly.core.context.{ExecutionContextFactory, Key}
+import flowly.core.tasks.compose.CancelFlow
 
 import scala.annotation.tailrec
 
@@ -167,6 +168,15 @@ trait Workflow {
 
         })
 
+      case Cancel =>
+        repository.update(session.cancelled(task)).fold(onFailure, { session =>
+
+          // On Cancel Event
+          eventListeners.foreach(_.onCancel(session.sessionId, executionContext, task.name))
+
+          Right(ExecutionResult(session, executionContext, task))
+        })
+
       case ToRetry(cause, attempts) =>
 
         repository.update(session.toRetry(task, cause, attempts)).fold(onFailure, { session =>
@@ -191,6 +201,10 @@ trait Workflow {
 
     }
 
+  }
+
+  def cancel(sessionId: SessionId): ErrorOr[ExecutionResult] = {
+    execute(sessionId, List(Param(CancelFlow, true)))
   }
 
   /**

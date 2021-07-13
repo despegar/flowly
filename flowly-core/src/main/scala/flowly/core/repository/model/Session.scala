@@ -43,6 +43,10 @@ case class Session(sessionId: SessionId, variables: Variables, lastExecution: Op
     copy(lastExecution = Option(Execution(task.name)), status = FINISHED, attempts = None)
   }
 
+  def cancelled(task: Task): Session = {
+    copy(lastExecution = Option(Execution(task.name, "Flow cancelled by user")), status = CANCELLED, attempts = attempts.map(_.stopRetrying()))
+  }
+
   def onError(task: Task, throwable: Throwable): Session = {
     copy(lastExecution = Option(Execution(task.name, throwable.getMessage)), status = ERROR, attempts = attempts.map(_.stopRetrying()))
   }
@@ -52,7 +56,7 @@ case class Session(sessionId: SessionId, variables: Variables, lastExecution: Op
   }
 
   def isExecutable: Boolean = status match {
-    case RUNNING | FINISHED => false
+    case RUNNING | FINISHED | CANCELLED => false
     case _ => true
   }
 
