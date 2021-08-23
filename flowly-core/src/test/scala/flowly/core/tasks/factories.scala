@@ -3,6 +3,9 @@ package flowly.core.tasks
 import flowly.core.ErrorOr
 import flowly.core.context.{Key, ReadableExecutionContext, WritableExecutionContext}
 import flowly.core.tasks.basic.Task
+import flowly.core.tasks.compose.{Cancellable, Retry}
+import flowly.core.tasks.strategies.scheduling.{ConstantSchedulingStrategy, SchedulingStrategy}
+import flowly.core.tasks.strategies.stopping.{QuantityStoppingStrategy, StoppingStrategy}
 
 
 object BlockingTask {
@@ -66,4 +69,20 @@ object ExecutionTask {
 
   }
 
+}
+
+object BlockingRetryCancellableTask {
+  def apply(_name: String, _next: Task, _condition: ReadableExecutionContext => ErrorOr[Boolean],
+            _allowedKeys: List[Key[_]]): basic.BlockingTask = new basic.BlockingTask with Cancellable with Retry {
+
+    override val next: Task = _next
+
+    override protected def condition(executionContext: ReadableExecutionContext): ErrorOr[Boolean] = _condition.apply(executionContext)
+
+    override protected def customAllowedKeys: List[Key[_]] = _allowedKeys
+
+    override protected def schedulingStrategy: SchedulingStrategy = new ConstantSchedulingStrategy(1)
+
+    override protected def stoppingStrategy: StoppingStrategy = new QuantityStoppingStrategy(50)
+  }
 }

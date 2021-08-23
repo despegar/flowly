@@ -44,4 +44,6 @@ trait EventListener {
 
   def onToRetry(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String, cause: Throwable, attempts: Attempts): Unit
 
+  def onCancel(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit
+
 }

@@ -47,6 +47,12 @@ case class SkipAndContinue(nextTask: Task, executionContext: WritableExecutionCo
 case object Finish extends TaskResult
 
 /**
+  * Current workflow execution has cancelled
+  *
+  */
+case object Cancel extends TaskResult
+
+/**
   * Current workflow execution cannot continue because a condition is not met
   *
   */
