@@ -5,7 +5,7 @@ object CommonSettings {
 
   val settings: Seq[Def.Setting[_]] =
       Seq(organization := "com.despegar.flowly",
-          publishTo := Some("Nexus Despegar" at s"https://backoffice-secure.despegar.com/nexus/repository/maven-${if (isSnapshot.value) "snapshots" else "releases"}"),
+          publishTo := Some("Nexus Despegar" at s"https://backoffice-secure.despegar.com/nexus/repository/maven-${if (isSnapshot.value) "snapshots" else "releases"}/"),
           resolvers += Opts.resolver.mavenLocalFile,
           resolvers += Resolver.mavenLocal,
           resolvers += "Despegar Nexus Repository" at "https://backoffice-secure.despegar.com/nexus/repository/maven-all/",
