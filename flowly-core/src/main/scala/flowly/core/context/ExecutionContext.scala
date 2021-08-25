@@ -77,7 +77,7 @@ class ExecutionContext private[flowly](val variables: Variables, val attempts:Op
 
   def set[T: Manifest](key: Key[T], value: T): ExecutionContext = new ExecutionContext(variables.updated(key.identifier, serializer.deepCopy(value)), attempts, serializer)
 
-  def unset(key: Key[_]): ExecutionContext = new ExecutionContext(variables.removed(key.identifier), attempts, serializer)
+  def unset(key: Key[_]): ExecutionContext = new ExecutionContext(variables - key.identifier, attempts, serializer)
 
 }
 

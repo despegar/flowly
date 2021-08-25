@@ -33,12 +33,22 @@ class ExecutionTaskSpec extends Specification {
       task.execute("session1", ec) must haveClass[Continue]
     }
 
-    "after a continue variables can change" in new TasksContext {
+    "after a continue variables can be added" in new TasksContext {
       val task = tasks.ExecutionTask("1", FinishTask("2")) { case (_, ec) => Right(ec.set(StringKey, "value2")) }
       task.execute("session1", ec) match {
         case Continue(_, v) => v.get(StringKey) must beSome("value2")
         case otherwise => failure(s"$otherwise must be Continue")
       }
+    }
+
+    "after a continue variables can be removed" in new TasksContext {
+      val task1 = tasks.ExecutionTask("1", FinishTask("2")) { case (_, ec) => Right(ec.unset(StringKey)) }
+
+      task1.execute("session1", ec) match {
+        case Continue(_, v) => v.get(StringKey) must beNone
+        case otherwise => failure(s"$otherwise must be Continue")
+      }
+
     }
 
     "after a continue next task must be correct" in new TasksContext {
