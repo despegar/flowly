@@ -19,7 +19,7 @@ package flowly.core.tasks.basic
 import flowly.core.{DisjunctionTaskError, ErrorOr}
 import flowly.core.tasks.model.{Block, Continue, OnError, TaskResult}
 import flowly.core.context.{ExecutionContext, ReadableExecutionContext}
-
+import flowly.core.compat.CompatUtils
 /**
   * An instance of this [[Task]] will choose a branch of execution between different paths based on given conditions.
   *
@@ -37,7 +37,7 @@ trait DisjunctionTask extends Task {
 
   private[flowly] def execute(sessionId: String, executionContext: ExecutionContext): TaskResult = try {
 
-    val branch = branches.to(LazyList).map{case (condition, nextTask) => (condition(executionContext), nextTask)}.dropWhile({
+    val branch = CompatUtils.toLazyColl(branches).map{case (condition, nextTask) => (condition(executionContext), nextTask)}.dropWhile({
       case (Right(false), _) => true
       case _ => false
     }).headOption

@@ -3,21 +3,21 @@ package flowly.mongodb
 import java.lang
 import java.time.Instant
 import java.util.Date
-
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoCursor
 import com.mongodb.client.model.IndexOptions
+import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
 import flowly.core.repository.model.Session.{SessionId, Status}
 import flowly.core.{ErrorOr, SessionNotFound}
+
 import javax.persistence.{OptimisticLockException, PersistenceException}
 import org.bson.Document
 import org.mongojack.JacksonMongoCollection
 
-import scala.jdk.CollectionConverters._
 import scala.language.implicitConversions
 import scala.util.{Failure, Success, Try}
 
@@ -78,7 +78,7 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
     }
   }
 
-  protected def Document(values:(String, AnyRef)*):Document = new Document(Map(values:_*).asJava)
+  protected def Document(values:(String, AnyRef)*):Document = new Document(CompatUtils.asJavaMap(values:_*))
 
   protected  implicit class NumberOps(value:Long) {
     def asJava:lang.Long = lang.Long.valueOf(value)
