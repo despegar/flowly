@@ -1,12 +1,11 @@
 package flowly.mongodb
 
-import java.time.Instant
-import java.util.Date
-
 import com.fasterxml.jackson.core.{JsonGenerator, JsonParser}
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.{DeserializationContext, JsonDeserializer, JsonSerializer, SerializerProvider}
-import org.mongojack.internal.`object`.document.DocumentObjectGenerator
+
+import java.time.Instant
+import java.util.Date
 
 object CustomDateModule extends SimpleModule("CustomDateModule") {
   this.addDeserializer(classOf[Instant], InstantJsonDeserializer)
@@ -28,10 +27,7 @@ object InstantJsonDeserializer extends JsonDeserializer[Instant] {
 
 object DateJsonSerializer extends JsonSerializer[Date] {
   def serialize(value: Date, jgen: JsonGenerator, serializers: SerializerProvider): Unit = {
-    jgen match {
-      case _: DocumentObjectGenerator => jgen.writeObject(value)
-      case _ => jgen.writeString(value.toString)
-    }
+    jgen.writeString(value.toInstant.toString)
   }
 }
 

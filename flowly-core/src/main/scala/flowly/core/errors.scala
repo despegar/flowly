@@ -32,14 +32,13 @@ object ExecutionError {
 case class TaskNotFound(taskName: String) extends Throwable
 
 case class SessionNotFound(sessionId: SessionId) extends Throwable
+case class RepositoryError(message: String, throwable: Throwable) extends Throwable(message, throwable)
 
 case class SessionCantBeExecuted(sessionId: String) extends Throwable
 
 case class KeyNotFound(key: String) extends Throwable
 
 case class ParamsNotAllowed(params: List[Param]) extends Throwable
-
-case class RepositoryError()
 
 case class DisjunctionTaskError(taskName:String) extends Throwable
 

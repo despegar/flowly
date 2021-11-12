@@ -16,33 +16,34 @@ package flowly.demo
  * limitations under the License.
  */
 
-import java.io.IOError
-import java.time.Instant
-
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.mongodb.MongoClient
+import com.mongodb.{ConnectionString, MongoClientSettings}
+import com.mongodb.client.{MongoClient, MongoClients}
+import com.mongodb.client.internal.MongoClientImpl
+import flowly.core.Workflow
 import flowly.core.context.{ExecutionContextFactory, Key, ReadableExecutionContext, WritableExecutionContext}
 import flowly.core.events.EventListener
+import flowly.core.repository.Repository
 import flowly.core.repository.model.Attempts
-import flowly.core.repository.{InMemoryRepository, Repository}
 import flowly.core.tasks.basic._
-import flowly.core.tasks.compose.{Alternative, Retry, Retryable}
+import flowly.core.tasks.compose.{Retry, Retryable}
 import flowly.core.tasks.strategies.scheduling.SchedulingStrategy
 import flowly.core.tasks.strategies.stopping.StoppingStrategy
-import flowly.core.Workflow
 import flowly.mongodb.{CustomDateModule, MongoDBRepository}
 
-import scala.util.Try
+import java.time.Instant
+import java.util.Date
 
 
 object MainTest extends App {
 
   trait RepositoryComponent {
     this: ObjectMapperRepositoryComponent =>
-    val client = new MongoClient("localhost")
+
+    val client = MongoClients.create("mongodb://localhost")
     lazy val repository = new MongoDBRepository(client, "flowly", "demo", objectMapperRepository)
     //    lazy val repository = new InMemoryRepository
   }
@@ -89,7 +90,8 @@ object MainTest extends App {
       val next: Task = third
 
       protected def perform(sessionId: String, executionContext: WritableExecutionContext) = {
-        Left(new RuntimeException("todo mal"))
+        //Left(new RuntimeException("todo mal"))
+        Right(executionContext)
       }
 
       protected def schedulingStrategy = Now
@@ -141,8 +143,11 @@ object MainTest extends App {
       val next: Task = blockingDisjunction
 
       protected def perform(sessionId: String, executionContext: WritableExecutionContext) = {
-        //        Right(executionContext.set(Key1, "foo bar baz"))
-        Left(CustomError("todo mal"))
+        val context = executionContext.set(Key8, new Date())
+        val context2 = context.set(Key1, "foo bar baz")
+        val maybeDate = context2.get(Key8)
+        Right(context2)
+        //Left(CustomError("todo mal"))
       }
 
       override protected def schedulingStrategy = Now
@@ -186,6 +191,7 @@ case object Key4 extends Key[Boolean]
 case object Key5 extends Key[Int]
 case object Key6 extends Key[Int]
 case object Key7 extends Key[Instant]
+case object Key8 extends Key[Date]
 
 object Always extends StoppingStrategy {
   override def shouldRetry(executionContext: ReadableExecutionContext, attempts: Attempts): Boolean = true
