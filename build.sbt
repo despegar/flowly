@@ -6,7 +6,7 @@ lazy val root = (project in file("."))
   )
   .aggregate(`flowly-core`, `flowly-mongodb`, `flowly-demo`)
 
-val jacksonVersion = "2.9.9"
+val jacksonVersion = "2.13.1"
 
 lazy val `flowly-core` = project
   .settings(CommonSettings.settings: _*)
