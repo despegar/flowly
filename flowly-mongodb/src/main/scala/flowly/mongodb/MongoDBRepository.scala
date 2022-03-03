@@ -4,7 +4,7 @@ import java.lang
 import java.time.Instant
 import java.util.Date
 import com.fasterxml.jackson.databind._
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.ScalaObjectMapper
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoCursor
 import com.mongodb.client.model.IndexOptions

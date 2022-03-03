@@ -1,7 +1,7 @@
 package flowly.demo
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
+import com.fasterxml.jackson.module.scala.ScalaObjectMapper
 import flowly.core.SerializationException
 import flowly.core.serialization.Serializer
 
