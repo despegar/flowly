@@ -96,8 +96,8 @@ trait Workflow {
     executionContext = executionContextFactory.create(session)
 
     // On Start or Resume Event
-    _ = session.lastExecution.fold(eventListeners.foreach(_.onStart(sessionId, executionContext)) ) { _ =>
-      eventListeners.foreach(_.onResume(sessionId, executionContext))
+    _ = session.lastExecution.fold(eventListeners.foreach(_.onStart(sessionId, executionContext, currentTask.name)) ) { _ =>
+      eventListeners.foreach(_.onResume(sessionId, executionContext, currentTask.name))
     }
 
     // Execute from Current Task
