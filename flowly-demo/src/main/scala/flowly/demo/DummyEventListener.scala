@@ -28,12 +28,12 @@ class DummyEventListener extends EventListener {
     println(s"Init a new instance $sessionId")
   }
 
-  def onStart(sessionId: SessionId, variables: ReadableExecutionContext, taskName: String): Unit = {
-    println(s"session $sessionId just started. task $taskName")
+  def onStart(sessionId: SessionId, variables: ReadableExecutionContext, currentTask: String): Unit = {
+    println(s"session $sessionId just started. task $currentTask")
   }
 
-  def onResume(sessionId: SessionId, executionContext: ReadableExecutionContext, taskName: String): Unit = {
-    println(s"session $sessionId has been resumed with task $taskName")
+  def onResume(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit = {
+    println(s"session $sessionId has been resumed with task $currentTask")
   }
 
   def onContinue(sessionId: SessionId, variables: ReadableExecutionContext, currentTask: String, nextTask:String): Unit = {
