@@ -28,9 +28,9 @@ trait EventListener {
 
   def onInitialization(sessionId: SessionId, vars: Variables): Unit
 
-  def onStart(sessionId: SessionId, executionContext: ReadableExecutionContext): Unit
+  def onStart(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit
 
-  def onResume(sessionId: SessionId, executionContext: ReadableExecutionContext): Unit
+  def onResume(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String): Unit
 
   def onContinue(sessionId: SessionId, executionContext: ReadableExecutionContext, currentTask: String, nextTask: String): Unit
 
