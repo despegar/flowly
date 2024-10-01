@@ -41,7 +41,7 @@ object MainTest extends App {
 
   trait RepositoryComponent {
     this: ObjectMapperRepositoryComponent =>
-    val client = MongoClients.create("localhost:s")
+    val client = MongoClients.create("localhost")
     lazy val repository = new MongoDBRepository(client, "flowly", "demo", objectMapperRepository)
     //    lazy val repository = new InMemoryRepository
   }
