@@ -18,12 +18,11 @@ package flowly.demo
 
 import java.io.IOError
 import java.time.Instant
-
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClients
 import flowly.core.context.{ExecutionContextFactory, Key, ReadableExecutionContext, WritableExecutionContext}
 import flowly.core.events.EventListener
 import flowly.core.repository.model.Attempts
@@ -42,7 +41,7 @@ object MainTest extends App {
 
   trait RepositoryComponent {
     this: ObjectMapperRepositoryComponent =>
-    val client = new MongoClient("localhost")
+    val client = MongoClients.create("localhost")
     lazy val repository = new MongoDBRepository(client, "flowly", "demo", objectMapperRepository)
     //    lazy val repository = new InMemoryRepository
   }
@@ -166,16 +165,16 @@ object MainTest extends App {
   object Components extends WorkflowComponent with FirstComponent with SecondComponent with ThirdComponent with DisjunctionComponent with BlockingDisjunctionComponent with BlockingComponent with Finish1Component with Finish2Component with ObjectMapperRepositoryComponent with ObjectMapperContextComponent with RepositoryComponent
 
 
-    val r = for {
+  val r = for {
 
-      id <- Components.workflow.init()
+    id <- Components.workflow.init()
 
-      result <- Components.workflow.execute(id)
+    result <- Components.workflow.execute(id)
 
-    } yield result
+  } yield result
 
 
-    println(r)
+  println(r)
 
 }
 

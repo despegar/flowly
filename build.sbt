@@ -17,7 +17,8 @@ lazy val `flowly-core` = project
       "org.specs2" %% "specs2-mock" % "4.6.0" % "test",
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion,
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
+      "org.hamcrest" % "hamcrest-core" % "2.1" % "test"
     )
   )
 
@@ -26,7 +27,7 @@ lazy val `flowly-mongodb` = project
   .settings(
     name := "flowly-mongodb",
     libraryDependencies ++= Seq(
-      "org.mongojack" % "mongojack" % "2.10.0",
+      "org.mongojack" % "mongojack" % "4.0.0",
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
@@ -35,11 +36,11 @@ lazy val `flowly-mongodb` = project
   .dependsOn(`flowly-core`)
 
 lazy val `flowly-demo` = project
-    .settings(CommonSettings.settings: _*)
-    .settings(
-      name := "flowly-demo",
-      packagedArtifacts := Map.empty
-    )
-    .dependsOn(`flowly-core`, `flowly-mongodb`)
+  .settings(CommonSettings.settings: _*)
+  .settings(
+    name := "flowly-demo",
+    packagedArtifacts := Map.empty
+  )
+  .dependsOn(`flowly-core`, `flowly-mongodb`)
 
 scalacOptions in Test ++= Seq("-Yrangepos")
