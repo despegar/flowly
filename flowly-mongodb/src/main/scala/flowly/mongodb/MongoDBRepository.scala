@@ -11,7 +11,7 @@ import com.mongodb.client.model.IndexOptions
 import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
-import flowly.core.repository.model.Session.{SessionId, Status}
+import flowly.core.repository.model.Session.SessionId
 import flowly.core.{ErrorOr, SessionNotFound}
 
 import javax.persistence.{OptimisticLockException, PersistenceException}

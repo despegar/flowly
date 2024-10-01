@@ -16,7 +16,6 @@ package flowly.demo
  * limitations under the License.
  */
 
-import java.io.IOError
 import java.time.Instant
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -26,15 +25,14 @@ import com.mongodb.client.MongoClients
 import flowly.core.context.{ExecutionContextFactory, Key, ReadableExecutionContext, WritableExecutionContext}
 import flowly.core.events.EventListener
 import flowly.core.repository.model.Attempts
-import flowly.core.repository.{InMemoryRepository, Repository}
+import flowly.core.repository.Repository
 import flowly.core.tasks.basic._
-import flowly.core.tasks.compose.{Alternative, Retry, Retryable}
+import flowly.core.tasks.compose.{Retry, Retryable}
 import flowly.core.tasks.strategies.scheduling.SchedulingStrategy
 import flowly.core.tasks.strategies.stopping.StoppingStrategy
 import flowly.core.Workflow
 import flowly.mongodb.{CustomDateModule, MongoDBRepository}
 
-import scala.util.Try
 
 
 object MainTest extends App {
