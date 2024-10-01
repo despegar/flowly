@@ -24,10 +24,7 @@ import scala.util.{Failure, Success, Try}
 class MongoDBRepository(client: MongoClient, databaseName: String, collectionName: String, objectMapper: ObjectMapper with ScalaObjectMapper) extends Repository {
 
   protected val collection: JacksonMongoCollection[Session] = {
-    val mongoCollection = client.getDatabase(databaseName).getCollection(collectionName)
-
-    val builder: JacksonMongoCollection.JacksonMongoCollectionBuilder = JacksonMongoCollection.builder()
-    val coll = builder.withObjectMapper(objectMapper).build(client, databaseName, classOf[Session], UuidRepresentation.STANDARD)
+    val coll = JacksonMongoCollection.builder().withObjectMapper(objectMapper).build(client, databaseName, classOf[Session], UuidRepresentation.STANDARD)
 
     // Initialize sessionId index
     coll.createIndex(Document("sessionId" -> 1.asJava), new IndexOptions().unique(true))
