@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCursor
-import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions, UpdateOptions}
+import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions}
 import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
@@ -58,9 +58,7 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
   private[flowly] def update(session: Session): ErrorOr[Session] = {
     Try {
       // Update will replace every document field and it is going to increment in one unit its version
-      val jsonString = objectMapper.writeValueAsString(session)
-      val document = org.bson.Document.parse(jsonString)
-
+      val document = org.bson.Document.parse(objectMapper.writeValueAsString(session))
       document.remove("version")
 
       val update = Document("$set" -> document, "$inc" -> Document("version" -> 1.asJava))

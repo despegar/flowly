@@ -163,16 +163,16 @@ object MainTest extends App {
   object Components extends WorkflowComponent with FirstComponent with SecondComponent with ThirdComponent with DisjunctionComponent with BlockingDisjunctionComponent with BlockingComponent with Finish1Component with Finish2Component with ObjectMapperRepositoryComponent with ObjectMapperContextComponent with RepositoryComponent
 
 
-  val r = for {
+    val r = for {
 
-    id <- Components.workflow.init()
+      id <- Components.workflow.init()
 
-    result <- Components.workflow.execute(id)
+      result <- Components.workflow.execute(id)
 
-  } yield result
+    } yield result
 
 
-  println(r)
+    println(r)
 
 }
 
