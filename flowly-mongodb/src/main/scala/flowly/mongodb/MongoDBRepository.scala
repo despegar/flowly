@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCursor
-import com.mongodb.client.model.IndexOptions
+import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions, UpdateOptions}
 import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
@@ -67,8 +67,8 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
 
       // Condition: there is a session with the same sessionId and version
       val query = Document("sessionId" -> session.sessionId, "version" -> session.version.asJava)
-
-      collection.findOneAndUpdate(query, update)
+      val updateOptions = new FindOneAndUpdateOptions().upsert(true)
+      collection.findOneAndUpdate(query, update, updateOptions)
 
     } match {
       case Success(null) => Left(new OptimisticLockException(s"Session ${session.sessionId} was modified by another transaction"))
