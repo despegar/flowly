@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCursor
-import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions}
+import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions, ReplaceOptions}
 import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
@@ -57,16 +57,13 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
 
   private[flowly] def update(session: Session): ErrorOr[Session] = {
     Try {
-      val document = org.bson.Document.parse(objectMapper.writeValueAsString(session))
-
-      document.remove("version")
-
-      val update = Document("$set" -> document, "$inc" -> Document("version" -> 1.asJava))
-
-      // Condition: there is a session with the same sessionId and version
       val query = Document("sessionId" -> session.sessionId, "version" -> session.version.asJava)
-      val updateOptions = new FindOneAndUpdateOptions().upsert(true)
-      collection.findOneAndUpdate(query, update, updateOptions)
+
+      // Update will replace every document field and it is going to increment in one unit its version
+      val newSession = session.copy(version = session.version + 1)
+      val updateOptions = new ReplaceOptions().upsert(true)
+      collection.replaceOne(query, newSession, updateOptions)
+      newSession
 
     } match {
       case Success(null) => Left(new OptimisticLockException(s"Session ${session.sessionId} was modified by another transaction"))

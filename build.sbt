@@ -35,11 +35,11 @@ lazy val `flowly-mongodb` = project
   .dependsOn(`flowly-core`)
 
 lazy val `flowly-demo` = project
-  .settings(CommonSettings.settings: _*)
-  .settings(
-    name := "flowly-demo",
-    packagedArtifacts := Map.empty
-  )
-  .dependsOn(`flowly-core`, `flowly-mongodb`)
+    .settings(CommonSettings.settings: _*)
+    .settings(
+      name := "flowly-demo",
+      packagedArtifacts := Map.empty
+    )
+    .dependsOn(`flowly-core`, `flowly-mongodb`)
 
 scalacOptions in Test ++= Seq("-Yrangepos")
