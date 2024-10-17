@@ -57,10 +57,8 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
 
   private[flowly] def update(session: Session): ErrorOr[Session] = {
     Try {
-      // Update will replace every document field and it is going to increment in one unit its version
-      //val document = org.bson.Document.parse(objectMapper.writeValueAsString(session))
+      val document = org.bson.Document.parse(objectMapper.writeValueAsString(session))
 
-      val document = JacksonMongoCollection.convertToDocument(session, objectMapper, classOf[Session])
       document.remove("version")
 
       val update = Document("$set" -> document, "$inc" -> Document("version" -> 1.asJava))
