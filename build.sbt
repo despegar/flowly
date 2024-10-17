@@ -17,8 +17,7 @@ lazy val `flowly-core` = project
       "org.specs2" %% "specs2-mock" % "4.6.0" % "test",
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion,
-      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion,
-      "org.hamcrest" % "hamcrest-core" % "2.1" % "test"
+      "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
     )
   )
 
