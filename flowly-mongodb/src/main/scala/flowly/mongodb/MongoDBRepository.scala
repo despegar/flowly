@@ -5,17 +5,17 @@ import java.time.Instant
 import java.util.Date
 import com.fasterxml.jackson.databind._
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
-import com.mongodb.MongoClient
+import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCursor
-import com.mongodb.client.model.IndexOptions
+import com.mongodb.client.model.{FindOneAndUpdateOptions, IndexOptions, ReplaceOptions}
 import flowly.core.compat.CompatUtils
 import flowly.core.repository.Repository
 import flowly.core.repository.model.{Session, Status}
-import flowly.core.repository.model.Session.{SessionId, Status}
+import flowly.core.repository.model.Session.SessionId
 import flowly.core.{ErrorOr, SessionNotFound}
 
 import javax.persistence.{OptimisticLockException, PersistenceException}
-import org.bson.Document
+import org.bson.{Document, UuidRepresentation}
 import org.mongojack.JacksonMongoCollection
 
 import scala.language.implicitConversions
@@ -24,10 +24,7 @@ import scala.util.{Failure, Success, Try}
 class MongoDBRepository(client: MongoClient, databaseName: String, collectionName: String, objectMapper: ObjectMapper with ScalaObjectMapper) extends Repository {
 
   protected val collection: JacksonMongoCollection[Session] = {
-    val mongoCollection = client.getDatabase(databaseName).getCollection(collectionName)
-
-    val builder: JacksonMongoCollection.JacksonMongoCollectionBuilder[Session] = JacksonMongoCollection.builder()
-    val coll = builder.withObjectMapper(objectMapper).build(mongoCollection, classOf[Session])
+    val coll = JacksonMongoCollection.builder().withObjectMapper(objectMapper).build(client, databaseName, collectionName, classOf[Session], UuidRepresentation.STANDARD)
 
     // Initialize sessionId index
     coll.createIndex(Document("sessionId" -> 1.asJava), new IndexOptions().unique(true))
@@ -60,16 +57,13 @@ class MongoDBRepository(client: MongoClient, databaseName: String, collectionNam
 
   private[flowly] def update(session: Session): ErrorOr[Session] = {
     Try {
-      // Update will replace every document field and it is going to increment in one unit its version
-      val document = JacksonMongoCollection.convertToDocument(session, objectMapper, classOf[Session])
-      document.remove("version")
-
-      val update = Document("$set" -> document, "$inc" -> Document("version" -> 1.asJava))
-
-      // Condition: there is a session with the same sessionId and version
       val query = Document("sessionId" -> session.sessionId, "version" -> session.version.asJava)
 
-      collection.findAndModify(query, Document(), Document(), collection.serializeFields(update), true, false)
+      // Update will replace every document field and it is going to increment in one unit its version
+      val newSession = session.copy(version = session.version + 1)
+      val updateOptions = new ReplaceOptions().upsert(true)
+      collection.replaceOne(query, newSession, updateOptions)
+      newSession
 
     } match {
       case Success(null) => Left(new OptimisticLockException(s"Session ${session.sessionId} was modified by another transaction"))

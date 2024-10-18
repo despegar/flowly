@@ -26,7 +26,7 @@ lazy val `flowly-mongodb` = project
   .settings(
     name := "flowly-mongodb",
     libraryDependencies ++= Seq(
-      "org.mongojack" % "mongojack" % "2.10.0",
+      "org.mongojack" % "mongojack" % "4.0.0",
       "com.fasterxml.jackson.core" % "jackson-databind" % jacksonVersion,
       "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % jacksonVersion,
       "com.fasterxml.jackson.module" %% "jackson-module-scala" % jacksonVersion
